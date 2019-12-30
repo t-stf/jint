@@ -34,7 +34,7 @@ namespace JIntTester
 		{
 			if (anObject is null)
 				return;
-			throw new AssertExecption("Null failed");
+			throw new AssertExecption(anObject.ToString());
 		}
 
 		public static void NotNull(object anObject)
