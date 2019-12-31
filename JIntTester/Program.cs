@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JIntTester
@@ -16,35 +18,44 @@ namespace JIntTester
 		static int nTests, nOk, nFails;
 
 		static Stopwatch sw;
+		static long maxSingleTime = 1000;
 
 		static void Main(string[] args)
 		{
 			Console.WriteLine("JintTester");
+			WriteLineWithColor("--- Start Testing ---", DefaultColor);
+
 			sw = Stopwatch.StartNew();
 
-			var tests = EcmaTest.SourceFiles(null, false);
-			WriteLineWithColor($"{tests.Count} Ecma tests loaded", DefaultColor);
-			var tester = new EcmaTest();
-			Parallel.For(0, tests.Count, i =>
-			//for (int i = 0; i < 100; i++)
-			{
-				TestSource(tester, tests[i]);
-			});
+			var tests = Test262Test.SourceFiles(null, false);
+			WriteLineWithColor($"\r{tests.Count} Ecma-262 tests loaded", DefaultColor);
+			RunTests(typeof(Test262Test), tests);
 			End();
-			//var tests=new EcmaTest()											
 
+			tests = EcmaTest.SourceFiles(null, false);
+			WriteLineWithColor($"{tests.Count} Ecma tests loaded (total:: {tests.Count+nTests})", DefaultColor);
+			RunTests(typeof(EcmaTest), tests);
+			End();
+			WriteLineWithColor("--- End Testing ---", DefaultColor);
 		}
-		static long maxSingleTime;
+
+		static void RunTests(Type testType, List<SourceFile> tests)
+		{
+			Parallel.For(0, tests.Count, i =>
+			{
+				TestSource(Activator.CreateInstance(testType) as JsFileTest, tests[tests.Count - i - 1]);
+			});
+		}
 
 		static void TestSource(JsFileTest tester, SourceFile source)
 		{
-			nTests++;
+			Interlocked.Increment(ref nTests);
 			int len = 70;
 			try
 			{
 				var watch = Stopwatch.StartNew();
 				tester.RunTestInternal(source);
-				nOk++;
+				Interlocked.Increment(ref nOk);
 				var ms = watch.ElapsedMilliseconds;
 				bool newMaxSingle = false;
 				if (ms > maxSingleTime)
@@ -62,13 +73,13 @@ namespace JIntTester
 					if (newMaxSingle)
 						WriteLineWithColor(s, ConsoleColor.Yellow);
 					else
-				  	WriteWithColor(s, TestColor);
+						WriteWithColor(s, TestColor);
 				}
 
 			}
 			catch (Exception ex)
 			{
-				nFails++;
+				Interlocked.Increment(ref nFails);
 				LogException(source, ex);
 			}
 
@@ -115,7 +126,7 @@ namespace JIntTester
 
 		public static void End()
 		{
-			sw.Stop();
+			var ms = sw.ElapsedMilliseconds;
 			WriteLineWithColor("", DefaultColor);
 			WriteLineWithColor("", DefaultColor);
 			WriteWithColor("Result   : ", OkColor);
@@ -128,19 +139,18 @@ namespace JIntTester
 			WriteLineWithColor("", DefaultColor);
 
 			WriteWithColor("Tests run: ", OkColor);
-			WriteWithColor(nTests.ToString(), DefaultColor);
+			WriteWithColor(nTests.ToString("###,###,##0"), DefaultColor);
 			WriteWithColor(", Passed: ", OkColor);
-			WriteWithColor(nOk.ToString(), DefaultColor);
+			WriteWithColor(nOk.ToString("###,###,##0"), DefaultColor);
 			WriteWithColor(", Failed: ", OkColor);
-			WriteLineWithColor(nFails.ToString(), nFails == 0 ? DefaultColor : ErrorColor);
+			WriteLineWithColor(nFails.ToString("###,###,##0"), nFails == 0 ? DefaultColor : ErrorColor);
 
 			WriteWithColor("End time : ", OkColor);
 			WriteLineWithColor(DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss"), DefaultColor);
 
 			WriteWithColor("Duration : ", OkColor);
-			WriteLineWithColor($"{sw.ElapsedMilliseconds / 1000.0:f2} s", DefaultColor);
-
-			WriteLineWithColor("--- End Testing ---", DefaultColor);
+			WriteLineWithColor($"{ms / 1000.0:f2} s", DefaultColor);
+			WriteLineWithColor("", OkColor);
 		}
 
 	}

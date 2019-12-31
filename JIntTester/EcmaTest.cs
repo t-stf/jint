@@ -11,8 +11,8 @@ namespace JIntTester
 {
   public abstract class JsFileTest
   {
-    public abstract void RunTestInternal(SourceFile sourceFile);
 
+    public abstract void RunTestInternal(SourceFile sourceFile);
   }
   
   public class EcmaTest : JsFileTest
@@ -20,7 +20,12 @@ namespace JIntTester
     private string _lastError;
     private static string staSource;
     protected Action<string> Error;
-    string BasePath;
+    protected string code;
+    protected bool negative;
+    protected SourceFile sourceFile;
+
+    protected string BasePath => sourceFile.BasePath;
+
 
     //NOTE: The Date tests in test262 assume the local timezone is Pacific Standard Time
     static TimeZoneInfo pacificTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
@@ -28,28 +33,22 @@ namespace JIntTester
     public EcmaTest()
     {
       Error = s => { _lastError = s; };
-      var assemblyPath = new Uri(typeof(EcmaTest).GetTypeInfo().Assembly.CodeBase).LocalPath;
-      var assemblyDirectory = new FileInfo(assemblyPath).Directory;
-
-      BasePath = assemblyDirectory.Parent.Parent.Parent.FullName;
     }
 
     public override void RunTestInternal(SourceFile sourceFile)
     {
-      BasePath = sourceFile.BasePath;
+      this.sourceFile = sourceFile;
       var fullName = Path.Combine(sourceFile.BasePath, sourceFile.Source);
       if (!File.Exists(fullName))
       {
         throw new ArgumentException("Could not find source file: " + fullName);
       }
-
-      string code = File.ReadAllText(fullName);
-      var negative = code.Contains("@negative");
-
-      RunTestCode(code, negative);
+      code = File.ReadAllText(fullName);
+      negative = code.Contains("@negative");
+      RunTestCode();
     }
 
-    protected void RunTestCode(string code, bool negative)
+    protected void RunTestCode()
     {
       _lastError = null;
 
@@ -62,9 +61,7 @@ namespace JIntTester
         var driverFilename = Path.Combine(BasePath, "sta.js");
         staSource = File.ReadAllText(driverFilename);
       }
-
       engine.Execute(staSource);
-
       if (negative)
       {
         try
@@ -77,7 +74,6 @@ namespace JIntTester
         {
           // exception is expected
         }
-
       }
       else
       {
@@ -93,7 +89,6 @@ namespace JIntTester
         {
           _lastError = e.ToString();
         }
-
         Assert.Null(_lastError);
       }
     }
@@ -138,8 +133,6 @@ namespace JIntTester
       return results;
     }
 
-
- 
   }
 
 }

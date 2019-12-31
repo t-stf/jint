@@ -22,12 +22,18 @@ namespace JIntTester
       BasePath = basePath;
     }
 
-    public string Source { get; set; }
-    public bool Skip { get; set; }
-    public string Reason { get; set; }
-    public string BasePath { get; set; }
+    public string Source { get; private set; }
+    public bool Skip { get; private set; }
+    public string Reason { get; private set; }
+    public string BasePath { get; private set; }
 
-
+    public SourceFile(string basePath, string source, bool skip, string reason)
+    {
+      this.BasePath = basePath;
+      this.Source = source;
+      this.Skip = skip;
+      this.Reason = reason;
+    }
 
     public override string ToString()
     {

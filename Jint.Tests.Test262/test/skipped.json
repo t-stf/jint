@@ -595,7 +595,7 @@
   },
 
   // Esprima problems
-  
+
   {
     "source": "language/statements/for/dstr-var-obj-ptrn-rest-getter.js",
     "reason": "Esprima problem"
@@ -803,5 +803,29 @@
   {
     "source": "language/expressions/function/params-trailing-comma-single.js",
     "reason": "Esprima problem"
+  },
+  {
+    "source": "language/statements/if/cptn-else-false-abrupt-empty.js",
+    "reason": "strange if-then-else"
+  },
+  {
+    "source": "language/statements/if/cptn-else-true-abrupt-empty.js",
+    "reason": "strange if-then-else"
+  },
+  {
+    "source": "language/statements/if/cptn-no-else-true-abrupt-empty.js",
+    "reason": "strange if-then-else"
+  },
+  {
+    "source": "language/statements/with/cptn-abrupt-empty.js",
+    "reason": "strange if-then-else"
+  },
+  {
+    "source": "built-ins/global/global-object.js",
+    "reason": "globalThis not implemented"
+  },
+  {
+    "source": "built-ins/global/property-descriptor.js",
+    "reason": "globalThis not implemented"
   }
 ]
