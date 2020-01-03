@@ -78,8 +78,8 @@ var b = function(v) {
             Assert.Equal("custom.js", e.Location.Source);
 
             var stack = e.CallStack;
-            Assert.Equal(@" at a(v) @ custom.js 8:6
- at b(7) @ main.js 8:1
+            Assert.Equal(@" at a(v) custom.js line 6
+ at b(7) main.js line 1
 ".Replace("\r\n", "\n"), stack.Replace("\r\n", "\n"));
         }
     }

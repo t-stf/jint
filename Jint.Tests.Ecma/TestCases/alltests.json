@@ -2935,8 +2935,8 @@
     source: "ch07/7.8/7.8.5/S7.8.5_A2.1_T1.js"
   },
   {
-    skip: false,
-    reason: "",
+    skip: true,
+    reason: "runs too long",
     source: "ch07/7.8/7.8.5/S7.8.5_A2.1_T2.js"
   },
   {

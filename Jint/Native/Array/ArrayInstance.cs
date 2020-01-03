@@ -883,10 +883,10 @@ namespace Jint.Native.Array
             }
         }
         
-        public override string ToString()
-        {
-            // debugger can make things hard when evaluates computed values
-            return "(" + (_length?._value.AsNumber() ?? 0) + ")[]";
-        }
+        //public override string ToString()
+        //{
+        //    // debugger can make things hard when evaluates computed values
+        //    return "(" + (_length?._value.AsNumber() ?? 0) + ")[]";
+        //}
     }
 }
