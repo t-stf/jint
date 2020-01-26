@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Esprima;
 using Esprima.Ast;
 using Jint.Native;
@@ -40,7 +41,8 @@ namespace Jint.Runtime
 
       using (var sb = StringBuilderPool.Rent())
       {
-        foreach (var cse in engine.CallStack)
+        var callStack = engine.CallStack.ToArray();
+        foreach (var cse in callStack)
         {
           sb.Builder.Append(" at ")
               .Append(cse)
@@ -66,7 +68,6 @@ namespace Jint.Runtime
         }
         CallStack = sb.ToString();
       }
-
       return this;
     }
 
